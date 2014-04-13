@@ -14,7 +14,11 @@ except:
 
 # Run mikidown
 try:
+    logging.basicConfig(filename='mikidown.log', level=logging.DEBUG)
+    logging.debug('Started')
     mikidown.main()
+    logging.debug('Finished')
+
 except KeyboardInterrupt:
     print('Interrupt', file=sys.stderr)
     sys.exit(1)
