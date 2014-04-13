@@ -444,9 +444,14 @@ class MikiWindow(QMainWindow):
 
         # Update attachmentView to show corresponding attachments.
         attachmentdir = self.notesTree.itemToAttachmentDir(current)
+        self.attachmentView.model.setRootPath(attachmentdir)
         self.__logger.debug("currentItemChangedWrapper: %s", attachmentdir)
         index = self.attachmentView.model.index(attachmentdir)
+        if index.row() == -1:
+            index = self.attachmentView.model.index(self.settings.attachmentPath)
+            self.attachmentView.model.setFilter(QDir.Files)
         self.attachmentView.setRootIndex(index)
+
 
     def tocNavigate(self, current):
         ''' works for notesEdit now '''
