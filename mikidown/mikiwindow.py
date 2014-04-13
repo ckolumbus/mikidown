@@ -27,7 +27,12 @@ from .attachment import AttachmentView
 from .highlighter import MikiHighlighter
 from .utils import LineEditDialog, ViewedNoteIcon, parseHeaders, parseTitle
 
+import logging
+from autologging import logged, traced, TracedMethods
 
+_logger = logging.getLogger(__name__)
+
+@logged
 class MikiWindow(QMainWindow):
     def __init__(self, settings, parent=None):
         super(MikiWindow, self).__init__(parent)
@@ -400,8 +405,9 @@ class MikiWindow(QMainWindow):
     def updateAttachmentView(self):
         # Update attachmentView to show corresponding attachments.
         item = self.notesTree.currentItem()
-        index = self.attachmentView.model.index(
-            self.notesTree.itemToAttachmentDir(item))
+        attachmentdir = self.notesTree.itemToAttachmentDir(item)
+        self.__logger.debug("UpdateAttatchementView : %s", attachmentdir)
+        index = self.attachmentView.model.index(attachmentdir)
         self.attachmentView.setRootIndex(index)
 
     def openFile(self, filename):
@@ -437,8 +443,9 @@ class MikiWindow(QMainWindow):
         self.openFile(currentFile)
 
         # Update attachmentView to show corresponding attachments.
-        index = self.attachmentView.model.index(
-            self.notesTree.itemToAttachmentDir(current))
+        attachmentdir = self.notesTree.itemToAttachmentDir(current)
+        self.__logger.debug("currentItemChangedWrapper: %s", attachmentdir)
+        index = self.attachmentView.model.index(attachmentdir)
         self.attachmentView.setRootIndex(index)
 
     def tocNavigate(self, current):
