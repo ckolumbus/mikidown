@@ -79,7 +79,7 @@ class MikiTree(QTreeWidget):
 
         # When exists foo.md, foo.mkd, foo.markdown,
         # the one with defExt will be returned
-        extName = ['.md', '.mkd', '.markdown']
+        extName = ['.md', '.mkd', '.markdown', '.rst']
         defExt = self.settings.fileExt
         if defExt in extName:
             extName.remove(defExt)

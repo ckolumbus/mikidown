@@ -501,8 +501,8 @@ class MikiWindow(QMainWindow):
         printer.setCreator(__appname__ + ' ' + __version__)
         printer.setDocName(self.notesTree.currentItem().text(0))
         printdialog = QPrintDialog(printer, self)
-        if printdialog.exec() == QDialog.Accepted:
-            self.notesView.print_(printer)
+#        if printdialog.exec() == QDialog.Accepted:
+#            self.notesView.print_(printer)
 
     def noteEditted(self):
         """ Continuously get fired while editing"""

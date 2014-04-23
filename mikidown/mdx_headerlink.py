@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 HeaderLink Extension for Python-Markdown
 ========================================
