@@ -101,6 +101,7 @@ class Monolithic(unittest.TestCase):
 
     def step6(self):
         print("\nLast step: clean up")
+        # TODO: proper cleanup beyond workaround below
         self.window.close()
         shutil.rmtree("test_notebook",True)
 
