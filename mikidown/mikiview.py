@@ -1,4 +1,5 @@
 import re
+import platform
 
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebKitWidgets
@@ -15,11 +16,16 @@ class MikiView(QtWebKitWidgets.QWebView):
         super(MikiView, self).__init__(parent)
         self.parent = parent
 
+        self.fileUrlPrefix = "file://"
+        if platform.system() == "Windows":
+            self.fileUrlPrefix = "file:///"
+
         self.settings().clearMemoryCaches()
         self.notePath = parent.settings.notePath
-        self.settings().setUserStyleSheetUrl(
-            QtCore.QUrl('file://'+self.parent.settings.cssfile))
-        print(QtCore.QUrl('file://'+self.parent.settings.cssfile))
+        self.notebookPath = parent.settings.notebookPath
+        cssurl = QtCore.QUrl(self.fileUrlPrefix+self.parent.settings.cssfile)
+        self.settings().setUserStyleSheetUrl(cssurl)
+        print(cssurl)
         self.page().setLinkDelegationPolicy(QtWebKitWidgets.QWebPage.DelegateAllLinks)
 
         self.page().linkClicked.connect(self.linkClicked)
@@ -36,13 +42,14 @@ class MikiView(QtWebKitWidgets.QWebView):
             toc anchor link: #
         '''
         name = qurl.toString()
+        print("linkClicked - name: ", name)
         http = re.compile('https?://')
         if http.match(name):                        # external uri
             QtGui.QDesktopServices.openUrl(qurl)
             return
 
         self.load(qurl)
-        name = name.replace('file://', '')
+        name = name.replace(self.fileUrlPrefix, '')
         name = name.replace(self.notePath, '').split('#')
         item = self.parent.notesTree.pageToItem(name[0])
         if not item or item == self.parent.notesTree.currentItem():
@@ -50,7 +57,7 @@ class MikiView(QtWebKitWidgets.QWebView):
         else:
             self.parent.notesTree.setCurrentItem(item)
             if len(name) > 1:
-                link = "file://" + self.notePath + "/#" + name[1]
+                link = self.fileUrlPrefix + self.notePath + "/#" + name[1]
                 self.load(QtCore.QUrl(link))
             viewFrame = self.page().mainFrame()
             self.scrollPosition = viewFrame.scrollPosition()
@@ -61,10 +68,11 @@ class MikiView(QtWebKitWidgets.QWebView):
             toc link shown as: /parent/child/pageName#anchor (ToFix)
         '''
         # TODO: link to page by: /parent/child/pageName#anchor
+        print("linkHovered - link: ", link)
         if link == '':                              # not hovered
             self.parent.statusBar.showMessage(self.parent.notesTree.currentPage())
         else:                                       # beautify link
-            link = link.replace('file://', '')
+            link = link.replace(self.fileUrlPrefix, '')
             link = link.replace(self.notePath, '')
             self.parent.statusBar.showMessage(link)
 
@@ -81,13 +89,14 @@ class MikiView(QtWebKitWidgets.QWebView):
         viewFrame.setScrollPosition(self.scrollPosition)
 
     def updateView(self):
-        # url_notebook = 'file://' + os.path.join(self.notePath, '/')
+        # url_notebook = self.fileUrlPrefix + os.path.join(self.notePath, '/')
         viewFrame = self.page().mainFrame()
         # Store scrollPosition before update notesView
         self.scrollPosition = viewFrame.scrollPosition()
         self.contentsSize = viewFrame.contentsSize()
-        url_notebook = 'file://' + self.notePath + '/'
-        self.setHtml(self.parent.notesEdit.toHtml(), QtCore.QUrl(url_notebook))
+        url_notebook = self.fileUrlPrefix + self.notePath 
+        html = self.parent.notesEdit.toHtml()
+        self.setHtml(html, QtCore.QUrl(url_notebook))
         # Restore previous scrollPosition
         viewFrame.setScrollPosition(self.scrollPosition)
 

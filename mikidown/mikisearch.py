@@ -10,19 +10,25 @@ from PyQt4.QtGui import QCursor, QToolTip
 from PyQt4.QtWebKit import QWebView, QWebPage
 """
 
+import platform
+
 class MikiSearch(QtWebKitWidgets.QWebView):
 
     def __init__(self, parent=None):
         super(MikiSearch, self).__init__(parent)
         self.parent = parent
+        self.fileUrlPrefix = "file://"
+        if platform.system() == "Windows":
+            self.fileUrlPrefix = "file:///"
+
 
         self.settings().clearMemoryCaches()
         self.flag = False
         self.link = None
         self.setMouseTracking(True)
-        self.settings().setUserStyleSheetUrl(
-                        QtCore.QUrl('file://'+self.parent.settings.searchcssfile))
-        print(QtCore.QUrl('file://'+self.parent.settings.searchcssfile))
+        searchcssurl = QtCore.QUrl(self.fileUrlPrefix+self.parent.settings.searchcssfile)
+        self.settings().setUserStyleSheetUrl(searchcssurl)
+        print(searchcssurl)
         self.page().linkHovered.connect(self.linkHovered)
         self.page().setLinkDelegationPolicy(QtWebKitWidgets.QWebPage.DelegateAllLinks)
         self.page().linkClicked.connect(self.linkClicked)

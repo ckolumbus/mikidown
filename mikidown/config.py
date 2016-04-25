@@ -1,5 +1,6 @@
 import os
 import re
+import platform
 
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -26,7 +27,7 @@ class Setting():
             tags = fields.KEYWORD(commas=True))
 
         self.notebookName = notebooks[0][0]
-        self.notebookPath = notebooks[0][1]
+        self.notebookPath = notebooks[0][1].replace(os.sep, '/')
         self.templatesPath = os.path.join(self.notebookPath, "templates").replace(os.sep, '/')
         self.notePath = os.path.join(self.notebookPath, "notes").replace(os.sep, '/')
         self.htmlPath = os.path.join(self.notebookPath, "html", "notes").replace(os.sep, '/')
@@ -40,6 +41,9 @@ class Setting():
         self.searchcssfile = os.path.join(cssPath, "search-window.css").replace(os.sep, '/')
         self.qsettings = QtCore.QSettings(self.configfile, QtCore.QSettings.IniFormat)
         self.tplqsettings = QtCore.QSettings(self.templatesConfigfile, QtCore.QSettings.IniFormat)
+        self.fileUrlPrefix = "file://"
+        if platform.system() == "Windows":
+            self.fileUrlPrefix = "file:///"
 
         if os.path.exists(self.configfile):
             self.extensions = readListFromSettings(self.qsettings,

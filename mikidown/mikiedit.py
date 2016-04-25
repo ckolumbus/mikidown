@@ -126,12 +126,16 @@ class MikiEdit(QtWidgets.QTextEdit):
                 filename, extension = os.path.splitext(url)
                 filename = os.path.basename(filename)
                 newFilePath = os.path.join(attDir, filename + extension).replace(os.sep, '/')
-                relativeFilePath = newFilePath.replace(self.settings.notebookPath, "..")
+                relativeFilePath = newFilePath.replace(self.settings.notebookPath, ".")
                 attachments = self.settings.attachmentImage + self.settings.attachmentDocument
+                print("Att insert path: ", self.settings.notebookPath)
+                print("Att insert pahht: ", self.settings.notePath)
+                print("Att filepath : ", newFilePath)
+                print("Att  : ", attachments)
 
                 if QtCore.QUrl(qurl).isLocalFile():
                     if extension.lower() in attachments:
-                        nurl = url.replace("file://", "")
+                        nurl = url.replace(self.settings.fileurl, "")
                         QtCore.QFile.copy(nurl, newFilePath)
                         self.parent.updateAttachmentView()
 

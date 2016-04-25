@@ -40,6 +40,7 @@ class MikiSepNote(QtWidgets.QDockWidget):
 
         self.plain_text = plain_text
         self.notePath = settings.notePath
+        self.fileUrlPrefix = settings.fileUrlPrefix
 
         fh = QtCore.QFile(filename)
         try:
@@ -80,7 +81,7 @@ class MikiSepNote(QtWidgets.QDockWidget):
                     note_view.page().setLinkDelegationPolicy(QtWebKitWidgets.QWebPage.DelegateAllLinks)
                     note_view.linkClicked.connect(self.linkClicked)
                     note_view.settings().setUserStyleSheetUrl( 
-                     QtCore.QUrl('file://'+self.parent().settings.cssfile))
+                     QtCore.QUrl(self.fileUrlPrefix+self.parent().settings.cssfile))
                 self.note_view = note_view
                 splitty.addWidget(note_view)
                 self.tocw.updateToc(os.path.basename(name), 
@@ -115,7 +116,7 @@ class MikiSepNote(QtWidgets.QDockWidget):
 
         #"""
         #self.note_view.load(qurl)
-        name = name.replace('file://', '')
+        name = name.replace(self.fileUrlPrefix, '')
         name = name.replace(self.notePath, '').split('#')
         item = self.parent().notesTree.pageToItem(name[0])
         if not item or item == self.parent().notesTree.currentItem():
@@ -616,7 +617,7 @@ class MikiWindow(QtWidgets.QMainWindow):
         if current is None:
             return
         pos = int(current.text(1))
-        link = "file://" + self.notePath + "/#" + current.text(2)
+        link = self.fileUrlPrefix + self.notePath + "/#" + current.text(2)
         # Move cursor to END first will ensure
         # header is positioned at the top of visual area.
         self.notesEdit.moveCursor(QTextCursor.End)
